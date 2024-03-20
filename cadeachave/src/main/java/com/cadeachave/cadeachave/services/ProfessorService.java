@@ -43,7 +43,7 @@ public class ProfessorService {
         entity.setNome(professor.getNome());
         entity.setCpf(professor.getCpf());
         logger.info("Atualizando professor.");
-        return ResponseEntity.status(HttpStatus.OK).body(professorRepository.save(professor));
+        return ResponseEntity.status(HttpStatus.OK).body(professorRepository.save(entity));
     }
 
     public void delete (Long id){
