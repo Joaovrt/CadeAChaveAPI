@@ -1,5 +1,9 @@
 package com.cadeachave.cadeachave.models;
 
+import java.io.Serializable;
+
+import org.springframework.hateoas.RepresentationModel;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -10,7 +14,9 @@ import jakarta.persistence.UniqueConstraint;
 
 @Entity
 @Table(name = "professores", uniqueConstraints = @UniqueConstraint(columnNames = "cpf"))
-public class ProfessorModel {
+public class ProfessorModel extends RepresentationModel<ProfessorModel> implements Serializable{
+
+    private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

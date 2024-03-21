@@ -5,9 +5,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import com.cadeachave.cadeachave.controllers.ProfessorController;
 import com.cadeachave.cadeachave.exceptions.ResourceNotFoundException;
 import com.cadeachave.cadeachave.models.ProfessorModel;
 import com.cadeachave.cadeachave.repositories.ProfessorRepository;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 import java.util.List;
 import java.util.logging.Logger;
@@ -22,14 +26,65 @@ public class ProfessorService {
     public ResponseEntity<ProfessorModel> findById(Long id){
 
         logger.info("Buscando professor...");
-        return ResponseEntity.status(HttpStatus.OK).body(professorRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException("Nenhum professor encontrado com esse id.")));
+
+        ProfessorModel professor = professorRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException("Nenhum professor encontrado com esse id."));
+        professor.add(linkTo(methodOn(ProfessorController.class).findAll()).withRel("Lista de professores"));
+        return ResponseEntity.status(HttpStatus.OK).body(professor);
+    }
+
+    public ResponseEntity<ProfessorModel> findByCpf(String cpf){
+
+        logger.info("Buscando professor...");
+
+        ProfessorModel professor = professorRepository.findByCpf(cpf);
+        if(professor==null)
+            throw new ResourceNotFoundException("Nenhum professor encontrado com esse CPF.");
+        professor.add(linkTo(methodOn(ProfessorController.class).findAll()).withRel("Lista de professores"));
+        return ResponseEntity.status(HttpStatus.OK).body(professor);
+    }
+
+    public ResponseEntity<List<ProfessorModel>> findByNome(String name){
+
+        logger.info("Buscando professor...");
+
+        List<ProfessorModel> professorList = professorRepository.findByNome(name);
+        if(!professorList.isEmpty()){
+            for(ProfessorModel professor : professorList){
+                Long id = professor.getId();
+                professor.add(linkTo(methodOn(ProfessorController.class).findById(id)).withSelfRel());
+            }
+        }
+        else
+            throw new ResourceNotFoundException("Nenhum professor encontrado com esse Nome.");
+        return ResponseEntity.status(HttpStatus.OK).body(professorList);
+    }
+
+    public ResponseEntity<List<ProfessorModel>> findByCpfOrNomeContaining(String termo) {
+        logger.info("Buscando professores por CPF ou nome...");
+
+        List<ProfessorModel> professorList = professorRepository.findByCpfContainingOrNomeContaining(termo, termo);
+        if (professorList.isEmpty()) {
+            throw new ResourceNotFoundException("Nenhum professor encontrado com o CPF ou nome correspondente.");
+        }
+        for (ProfessorModel professor : professorList) {
+            Long id = professor.getId();
+            professor.add(linkTo(methodOn(ProfessorController.class).findById(id)).withSelfRel());
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(professorList);
     }
 
     public ResponseEntity<List<ProfessorModel>> findAll(){
 
         logger.info("Buscando professores...");
 
-       return ResponseEntity.status(HttpStatus.OK).body(professorRepository.findAll());
+        List<ProfessorModel> professorList = professorRepository.findAll();
+        if(!professorList.isEmpty()){
+            for(ProfessorModel professor : professorList){
+                Long id = professor.getId();
+                professor.add(linkTo(methodOn(ProfessorController.class).findById(id)).withSelfRel());
+            }
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(professorList);
     }
     
     public ResponseEntity<ProfessorModel> create(ProfessorModel professor){
@@ -46,9 +101,10 @@ public class ProfessorService {
         return ResponseEntity.status(HttpStatus.OK).body(professorRepository.save(entity));
     }
 
-    public void delete (Long id){
+    public ResponseEntity<Object> delete (Long id){
         var entity = professorRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException("Nenhum professor encontrado com esse id."));
         professorRepository.delete(entity);
         logger.info("Deletando professor.");
+        return ResponseEntity.status(HttpStatus.OK).body("Professor deletado.");
     }
 }

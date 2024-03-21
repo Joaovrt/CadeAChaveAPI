@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,7 +22,7 @@ import jakarta.validation.Valid;
 
 
 @RestController
-@RequestMapping("/api/professor/v1")
+@RequestMapping("/api/professor")
 public class ProfessorController {
 
     @Autowired
@@ -44,10 +45,30 @@ public class ProfessorController {
         return professorService.findById(id);
     }
 
+    @GetMapping(value="/cpf/{cpf}")
+    public ResponseEntity<ProfessorModel> findByCpf(@PathVariable(value = "cpf") String cpf){
+        return professorService.findByCpf(cpf);
+    }
+
+    @GetMapping(value="/nome/{nome}")
+    public ResponseEntity<List<ProfessorModel>> findByNome(@PathVariable(value = "nome") String nome){
+        return professorService.findByNome(nome);
+    }
+
+     @GetMapping(value="/cpfOuNome/{termo}")
+    public ResponseEntity<List<ProfessorModel>> findByCpfOrNomeContaining(@PathVariable(value = "termo") String termo) {
+        return professorService.findByCpfOrNomeContaining(termo);
+    }
+
     @PutMapping(value="/{id}")
     public ResponseEntity<ProfessorModel> update(@PathVariable(value = "id") Long id, @RequestBody @Valid ProfessorRecordDto professorRecordDto){
         var professorModel = new ProfessorModel();
         BeanUtils.copyProperties(professorRecordDto, professorModel);
         return professorService.update(professorModel, id);
+    }
+
+    @DeleteMapping(value="/{id}")
+    public ResponseEntity<Object> delete(@PathVariable(value = "id") Long id){
+        return professorService.delete(id);
     }
 }

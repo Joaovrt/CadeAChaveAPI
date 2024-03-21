@@ -1,5 +1,9 @@
 package com.cadeachave.cadeachave.models;
 
+import java.io.Serializable;
+
+import org.springframework.hateoas.RepresentationModel;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -10,7 +14,9 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "professores_salas")
-public class ProfessorSalaModel {
+public class ProfessorSalaModel extends RepresentationModel<ProfessorSalaModel> implements Serializable{
+
+    private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
