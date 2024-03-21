@@ -60,11 +60,11 @@ public class SalaService {
         return ResponseEntity.status(HttpStatus.OK).body(salaList);
     }
 
-    public ResponseEntity<List<SalaModel>> findByStatus(boolean status){
+    public ResponseEntity<List<SalaModel>> findByAberta(boolean aberta){
 
         logger.info("Buscando salas...");
 
-        List<SalaModel> salaList = salaRepository.findByStatus(status);
+        List<SalaModel> salaList = salaRepository.findByAberta(aberta);
         if(!salaList.isEmpty()){
             for(SalaModel sala : salaList){
                 Long id = sala.getId();
@@ -72,14 +72,14 @@ public class SalaService {
             }
         }
         else
-            throw new ResourceNotFoundException("Nenhuma sala encontrada com esse status.");
+            throw new ResourceNotFoundException("Nenhuma sala encontrada com esse aberta.");
         return ResponseEntity.status(HttpStatus.OK).body(salaList);
     }
 
-    public ResponseEntity<List<SalaModel>> findByNomeContainingAndStatus(String nome, boolean status) {
-        logger.info("Buscando sala por nome e status...");
+    public ResponseEntity<List<SalaModel>> findByNomeContainingAndAberta(String nome, boolean aberta) {
+        logger.info("Buscando sala por nome e aberta...");
 
-        List<SalaModel> salaList = salaRepository.findByNomeContainingAndStatus(nome, status);
+        List<SalaModel> salaList = salaRepository.findByNomeContainingAndAberta(nome, aberta);
         if (salaList.isEmpty()) {
             throw new ResourceNotFoundException("Nenhuma sala encontrada com o nome e status correspondente.");
         }
@@ -114,8 +114,7 @@ public class SalaService {
     public ResponseEntity<SalaModel> update (SalaModel sala, Long id){
         var entity = salaRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException("Nenhuma sala encontrada com esse id."));
         entity.setNome(sala.getNome());
-        entity.setCodigo(sala.getCodigo());
-        entity.setStatus(sala.isStatus());
+        entity.setAberta(sala.isAberta());
         logger.info("Atualizando sala.");
         return ResponseEntity.status(HttpStatus.OK).body(salaRepository.save(entity));
     }

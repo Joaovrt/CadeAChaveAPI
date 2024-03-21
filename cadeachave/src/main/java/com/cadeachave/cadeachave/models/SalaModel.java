@@ -22,14 +22,12 @@ public class SalaModel extends RepresentationModel<SalaModel> implements Seriali
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "nome", nullable = false, length = 10, unique = true)
+    @Column(nullable = false, length = 10, unique = true)
     private String nome;
 
-    @Column(name = "status", nullable = false)
-    private boolean status;
-    
-    @Column(name = "codigo", nullable = false, length = 250)
-    private String codigo;
+    @Column(nullable = false)
+    private boolean aberta;
+
     
     public Long getId() {
         return id;
@@ -47,19 +45,11 @@ public class SalaModel extends RepresentationModel<SalaModel> implements Seriali
         this.nome = nome;
     }
     
-    public boolean isStatus() {
-        return status;
+    public boolean isAberta() {
+        return aberta;
     }
     
-    public void setStatus(boolean status) {
-        this.status = status;
-    }
-    
-    public String getCodigo() {
-        return codigo;
-    }
-    
-    public void setCodigo(String codigo) {
-        this.codigo = codigo;
+    public void setAberta(boolean aberta) {
+        this.aberta = aberta;
     }
 }

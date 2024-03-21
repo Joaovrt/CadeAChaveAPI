@@ -54,14 +54,14 @@ public class SalaController {
         return salaService.findByNomeContaining(termo);
     }
 
-    @GetMapping(value="/status/{status}")
-    public ResponseEntity<List<SalaModel>> findByStatus(@PathVariable(value = "status") boolean status){
-        return salaService.findByStatus(status);
+    @GetMapping(value="/aberta/{aberta}")
+    public ResponseEntity<List<SalaModel>> findByAberta(@PathVariable(value = "aberta") boolean aberta){
+        return salaService.findByAberta(aberta);
     }
 
-    @GetMapping(value="/nomeEStatus/{nome}/{status}")
-    public ResponseEntity<List<SalaModel>> findByNomeContainingAndStatus(@PathVariable(value = "nome") String nome, @PathVariable(value = "status") boolean status) {
-        return salaService.findByNomeContainingAndStatus(nome,status);
+    @GetMapping(value="/nomeEAberta/{nome}/{aberta}")
+    public ResponseEntity<List<SalaModel>> findByNomeContainingAndAberta(@PathVariable(value = "nome") String nome, @PathVariable(value = "aberta") boolean aberta) {
+        return salaService.findByNomeContainingAndAberta(nome,aberta);
     }
 
     @PutMapping(value="/{id}")

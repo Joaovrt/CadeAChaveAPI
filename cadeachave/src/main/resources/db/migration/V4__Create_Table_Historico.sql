@@ -1,6 +1,7 @@
 CREATE TABLE IF NOT EXISTS historico (
     id SERIAL PRIMARY KEY,
-    professores_salas_id INT NOT NULL REFERENCES professores_salas(id),
+    professor_id INT NOT NULL REFERENCES professores(id),
+    sala_id INT NOT NULL REFERENCES salas(id),
     horario TIMESTAMP NOT NULL,
-    acao CHAR(1) NOT NULL
+    abriu boolean NOT NULL
 );

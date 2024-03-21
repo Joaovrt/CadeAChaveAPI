@@ -1,6 +1,5 @@
 package com.cadeachave.cadeachave.models;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -27,15 +26,17 @@ public class HistoricoModel extends RepresentationModel<HistoricoModel> implemen
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "professores_salas_id", referencedColumnName = "id")
-    private ProfessorSalaModel professorSala;
+    @JoinColumn(name = "professor_id", referencedColumnName = "id")
+    private ProfessorModel professor;
 
-    @Column(name = "horario")
+    @ManyToOne
+    @JoinColumn(name = "sala_id", referencedColumnName = "id")
+    private SalaModel sala;
+
     @Temporal(TemporalType.TIMESTAMP)
     private Timestamp horario;
 
-    @Column(name = "acao", length = 1)
-    private char acao;
+    private boolean abriu;
 
     public Long getId() {
         return id;
@@ -45,12 +46,20 @@ public class HistoricoModel extends RepresentationModel<HistoricoModel> implemen
         this.id = id;
     }
 
-    public ProfessorSalaModel getProfessorSala() {
-        return professorSala;
+    public ProfessorModel getProfessor() {
+        return professor;
     }
 
-    public void setProfessorSala(ProfessorSalaModel professorSala) {
-        this.professorSala = professorSala;
+    public void setProfessor(ProfessorModel professor) {
+        this.professor = professor;
+    }
+
+    public SalaModel getSala() {
+        return sala;
+    }
+
+    public void setSala(SalaModel sala) {
+        this.sala = sala;
     }
 
     public Timestamp getHorario() {
@@ -61,11 +70,12 @@ public class HistoricoModel extends RepresentationModel<HistoricoModel> implemen
         this.horario = horario;
     }
 
-    public char getAcao() {
-        return acao;
+    public boolean isAbriu() {
+        return abriu;
     }
 
-    public void setAcao(char acao) {
-        this.acao = acao;
+    public void setAbriu(boolean abriu) {
+        this.abriu = abriu;
     }
+
 }

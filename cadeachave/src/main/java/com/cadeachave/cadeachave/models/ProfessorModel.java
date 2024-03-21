@@ -22,10 +22,10 @@ public class ProfessorModel extends RepresentationModel<ProfessorModel> implemen
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "nome", nullable = false, length = 150)
+    @Column(nullable = false, length = 150)
     private String nome;
 
-    @Column(name = "cpf", nullable = false, unique = true, length = 11)
+    @Column(nullable = false, unique = true, length = 11)
     private String cpf;
 
     public Long getId() {

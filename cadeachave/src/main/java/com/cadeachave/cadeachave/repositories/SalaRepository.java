@@ -11,6 +11,6 @@ import com.cadeachave.cadeachave.models.SalaModel;
 public interface SalaRepository extends JpaRepository<SalaModel,Long>{
     SalaModel findByNome(String nome);
     List<SalaModel> findByNomeContaining(String nome);
-    List<SalaModel> findByStatus(boolean status);
-    List<SalaModel> findByNomeContainingAndStatus(String nome, boolean status);
+    List<SalaModel> findByAberta(boolean aberta);
+    List<SalaModel> findByNomeContainingAndAberta(String nome, boolean aberta);
 }
