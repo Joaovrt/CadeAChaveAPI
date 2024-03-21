@@ -8,6 +8,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
@@ -29,6 +31,7 @@ public class HistoricoModel extends RepresentationModel<HistoricoModel> implemen
     private ProfessorSalaModel professorSala;
 
     @Column(name = "horario")
+    @Temporal(TemporalType.TIMESTAMP)
     private Timestamp horario;
 
     @Column(name = "acao", length = 1)
