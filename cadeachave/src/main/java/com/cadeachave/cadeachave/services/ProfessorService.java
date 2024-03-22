@@ -5,14 +5,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import com.cadeachave.cadeachave.controllers.ProfessorController;
+import com.cadeachave.cadeachave.dtos.ProfessorRecordDto;
 import com.cadeachave.cadeachave.exceptions.ResourceNotFoundException;
 import com.cadeachave.cadeachave.models.ProfessorModel;
+import com.cadeachave.cadeachave.models.SalaModel;
 import com.cadeachave.cadeachave.repositories.ProfessorRepository;
+import com.cadeachave.cadeachave.repositories.SalaRepository;
 
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
-
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -22,6 +22,9 @@ public class ProfessorService {
 
     @Autowired
     ProfessorRepository professorRepository;
+
+    @Autowired
+    SalaRepository salaRepository;
 
     public ResponseEntity<ProfessorModel> findById(Long id){
 
@@ -69,17 +72,37 @@ public class ProfessorService {
         return ResponseEntity.status(HttpStatus.OK).body(professorList);
     }
     
-    public ResponseEntity<ProfessorModel> create(ProfessorModel professor){
-
-        logger.info("Cadastrando professor.");
-        return ResponseEntity.status(HttpStatus.CREATED).body(professorRepository.save(professor));
+    public ResponseEntity<ProfessorModel> create(ProfessorRecordDto professorDto) {
+    logger.info("Cadastrando professor.");
+    ProfessorModel professor = new ProfessorModel();
+    professor.setNome(professorDto.nome());
+    professor.setCpf(professorDto.cpf());
+    if (!professorDto.salas().isEmpty()) {
+        List<SalaModel> salaList = new ArrayList<>();
+        for (Long i : professorDto.salas()) {
+            SalaModel sala = salaRepository.findById(i)
+                    .orElseThrow(() -> new RuntimeException("Sala não encontrada para o ID: " + i));
+            salaList.add(sala);
+        }
+        professor.setSalas(salaList);
     }
+    return ResponseEntity.status(HttpStatus.CREATED).body(professorRepository.save(professor));
+}
 
-    public ResponseEntity<ProfessorModel> update (ProfessorModel professor, Long id){
+
+    public ResponseEntity<ProfessorModel> update (ProfessorRecordDto professorDto, Long id){
         var entity = professorRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException("Nenhum professor encontrado com esse id."));
-        entity.setNome(professor.getNome());
-        entity.setCpf(professor.getCpf());
-        entity.setSalas(professor.getSalas());
+        entity.setNome(professorDto.nome());
+        entity.setCpf(professorDto.cpf());
+        if (!professorDto.salas().isEmpty()) {
+            List<SalaModel> salaList = new ArrayList<>();
+            for (Long i : professorDto.salas()) {
+                SalaModel sala = salaRepository.findById(i)
+                        .orElseThrow(() -> new RuntimeException("Sala não encontrada para o ID: " + i));
+                salaList.add(sala);
+            }
+            entity.setSalas(salaList);
+        }
         logger.info("Atualizando professor.");
         return ResponseEntity.status(HttpStatus.OK).body(professorRepository.save(entity));
     }
@@ -90,4 +113,5 @@ public class ProfessorService {
         logger.info("Deletando professor.");
         return ResponseEntity.status(HttpStatus.OK).body("Professor deletado.");
     }
+
 }

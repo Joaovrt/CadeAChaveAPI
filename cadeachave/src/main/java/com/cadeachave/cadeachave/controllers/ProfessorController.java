@@ -2,7 +2,6 @@ package com.cadeachave.cadeachave.controllers;
 
 import java.util.List;
 
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -30,9 +29,7 @@ public class ProfessorController {
 
     @PostMapping()
     public ResponseEntity<ProfessorModel> create(@RequestBody @Valid ProfessorRecordDto professorRecordDto){
-        var professorModel = new ProfessorModel();
-        BeanUtils.copyProperties(professorRecordDto, professorModel);
-        return professorService.create(professorModel);
+        return professorService.create(professorRecordDto);
     }
 
     @GetMapping()
@@ -62,9 +59,7 @@ public class ProfessorController {
 
     @PutMapping(value="/{id}")
     public ResponseEntity<ProfessorModel> update(@PathVariable(value = "id") Long id, @RequestBody @Valid ProfessorRecordDto professorRecordDto){
-        var professorModel = new ProfessorModel();
-        BeanUtils.copyProperties(professorRecordDto, professorModel);
-        return professorService.update(professorModel, id);
+        return professorService.update(professorRecordDto, id);
     }
 
     @DeleteMapping(value="/{id}")

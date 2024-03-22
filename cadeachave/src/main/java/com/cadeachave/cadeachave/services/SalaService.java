@@ -5,14 +5,16 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import com.cadeachave.cadeachave.controllers.ProfessorController;
-import com.cadeachave.cadeachave.controllers.SalaController;
+import com.cadeachave.cadeachave.dtos.SalaRecordDto;
+import com.cadeachave.cadeachave.exceptions.ResourceConflictException;
 import com.cadeachave.cadeachave.exceptions.ResourceNotFoundException;
+import com.cadeachave.cadeachave.exceptions.ResourceUnauthorizedException;
+import com.cadeachave.cadeachave.models.HistoricoModel;
+import com.cadeachave.cadeachave.models.ProfessorModel;
 import com.cadeachave.cadeachave.models.SalaModel;
+import com.cadeachave.cadeachave.repositories.ProfessorRepository;
 import com.cadeachave.cadeachave.repositories.SalaRepository;
 
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 import java.util.List;
 import java.util.logging.Logger;
@@ -23,6 +25,12 @@ public class SalaService {
 
     @Autowired
     SalaRepository salaRepository;
+
+    @Autowired
+    ProfessorRepository professorRepository;
+
+    @Autowired
+    HistoricoService historicoService;
 
     public ResponseEntity<SalaModel> findById(Long id){
 
@@ -80,17 +88,21 @@ public class SalaService {
         return ResponseEntity.status(HttpStatus.OK).body(salaList);
     }
     
-    public ResponseEntity<SalaModel> create (SalaModel sala){
+    public ResponseEntity<SalaModel> create (SalaRecordDto salaDto){
 
         logger.info("Cadastrando sala.");
-
+        SalaModel sala = new SalaModel();
+        sala.setNome(salaDto.nome());
+        sala.setAberta(salaDto.aberta());
+       
         return ResponseEntity.status(HttpStatus.CREATED).body(salaRepository.save(sala));
     }
 
-    public ResponseEntity<SalaModel> update (SalaModel sala, Long id){
+    public ResponseEntity<SalaModel> update (SalaRecordDto salaDto, Long id){
         var entity = salaRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException("Nenhuma sala encontrada com esse id."));
-        entity.setNome(sala.getNome());
-        entity.setAberta(sala.isAberta());
+        entity.setNome(salaDto.nome());
+        entity.setAberta(salaDto.aberta());
+       
         logger.info("Atualizando sala.");
         return ResponseEntity.status(HttpStatus.OK).body(salaRepository.save(entity));
     }
@@ -100,5 +112,49 @@ public class SalaService {
         salaRepository.delete(entity);
         logger.info("Deletando sala.");
         return ResponseEntity.status(HttpStatus.OK).body("Sala deletada.");
+    }
+
+    public ResponseEntity<HistoricoModel> Abrir(String cpf, String nome){
+        ProfessorModel professor = professorRepository.findByCpf(cpf);
+        if(professor==null)
+            throw new ResourceNotFoundException("Nenhum professor encontrado com esse CPF.");
+        SalaModel sala = salaRepository.findByNome(nome);
+        if(sala==null)
+            throw new ResourceNotFoundException("Nenhuma sala encontrada com esse nome.");
+        if(professor.getSalas().contains(sala)){
+            if(sala.isAberta())
+                throw new ResourceConflictException("Sala já está aberta.");
+            else{
+                sala.setAberta(true);
+                salaRepository.save(sala);
+                return historicoService.create(professor, sala, true);
+            }
+        }
+        else
+            throw new ResourceUnauthorizedException("Acesso negado!");
+    }
+
+    public ResponseEntity<HistoricoModel> Fechar(String cpf, String nome){
+        ProfessorModel professor = professorRepository.findByCpf(cpf);
+        if(professor==null)
+            throw new ResourceNotFoundException("Nenhum professor encontrado com esse CPF.");
+        SalaModel sala = salaRepository.findByNome(nome);
+        if(sala==null)
+            throw new ResourceNotFoundException("Nenhuma sala encontrada com esse nome.");
+        if(professor.getSalas().contains(sala)){
+            if(!sala.isAberta())
+                throw new ResourceConflictException("Sala já está fechada.");
+            else{
+                if(historicoService.validaUltimoAAbrir(professor, sala)){
+                    sala.setAberta(false);
+                    salaRepository.save(sala);
+                    return historicoService.create(professor, sala, false);
+                }
+                else
+                    throw new ResourceUnauthorizedException("Acesso negado!");
+            }
+        }
+        else
+            throw new ResourceUnauthorizedException("Acesso negado!");
     }
 }

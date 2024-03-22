@@ -2,7 +2,6 @@ package com.cadeachave.cadeachave.controllers;
 
 import java.util.List;
 
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -15,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.cadeachave.cadeachave.dtos.SalaRecordDto;
+import com.cadeachave.cadeachave.models.HistoricoModel;
 import com.cadeachave.cadeachave.models.SalaModel;
 import com.cadeachave.cadeachave.services.SalaService;
 
@@ -29,9 +29,7 @@ public class SalaController {
 
     @PostMapping()
     public ResponseEntity<SalaModel> create(@RequestBody @Valid SalaRecordDto salaRecordDto){
-        var salaModel = new SalaModel();
-        BeanUtils.copyProperties(salaRecordDto, salaModel);
-        return salaService.create(salaModel);
+        return salaService.create(salaRecordDto);
     }
 
     @GetMapping()
@@ -66,13 +64,21 @@ public class SalaController {
 
     @PutMapping(value="/{id}")
     public ResponseEntity<SalaModel> update(@PathVariable(value = "id") Long id, @RequestBody @Valid SalaRecordDto salaRecordDto){
-        var salaModel = new SalaModel();
-        BeanUtils.copyProperties(salaRecordDto, salaModel);
-        return salaService.update(salaModel, id);
+        return salaService.update(salaRecordDto, id);
     }
 
     @DeleteMapping(value="/{id}")
     public ResponseEntity<Object> delete(@PathVariable(value = "id") Long id){
         return salaService.delete(id);
     }
+
+    // @PostMapping("/abrir/{cpf}/{nome}")
+    // public ResponseEntity<HistoricoModel> abrir(@PathVariable(value = "cpf") String cpf, @PathVariable(value = "nome") String nome) {
+    //     return salaService.Abrir(cpf, nome);
+    // }
+
+    // @PostMapping("/fechar/{cpf}/{nome}")
+    // public ResponseEntity<HistoricoModel> fechar(@PathVariable(value = "cpf") String cpf, @PathVariable(value = "nome") String nome) {
+    //     return salaService.Fechar(cpf, nome);
+    // }
 }
