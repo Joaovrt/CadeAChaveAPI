@@ -13,11 +13,10 @@ import jakarta.persistence.TemporalType;
 import java.io.Serializable;
 import java.sql.Timestamp;
 
-import org.springframework.hateoas.RepresentationModel;
 
 @Entity
 @Table(name = "historico")
-public class HistoricoModel extends RepresentationModel<HistoricoModel> implements Serializable{
+public class HistoricoModel implements Serializable{
 
     private static final long serialVersionUID = 1L;
 

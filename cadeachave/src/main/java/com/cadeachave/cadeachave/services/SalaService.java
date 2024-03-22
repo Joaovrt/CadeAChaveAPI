@@ -29,7 +29,6 @@ public class SalaService {
         logger.info("Buscando sala...");
 
         SalaModel sala = salaRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException("Nenhuma sala encontrada com esse id."));
-        sala.add(linkTo(methodOn(SalaController.class).findAll()).withRel("Lista de salas"));
         return ResponseEntity.status(HttpStatus.OK).body(sala);
     }
 
@@ -40,7 +39,6 @@ public class SalaService {
         SalaModel sala = salaRepository.findByNome(nome);
         if(sala==null)
             throw new ResourceNotFoundException("Nenhuma sala encontrada com esse nome.");
-        sala.add(linkTo(methodOn(SalaController.class).findAll()).withRel("Lista de salas"));
         return ResponseEntity.status(HttpStatus.OK).body(sala);
     }
 
@@ -49,13 +47,7 @@ public class SalaService {
         logger.info("Buscando salas...");
 
        List<SalaModel> salaList = salaRepository.findByNomeContaining(termo);
-        if(!salaList.isEmpty()){
-            for(SalaModel sala : salaList){
-                Long id = sala.getId();
-                sala.add(linkTo(methodOn(SalaController.class).findById(id)).withSelfRel());
-            }
-        }
-        else
+        if(salaList.isEmpty())
             throw new ResourceNotFoundException("Nenhum professor encontrado com o CPF ou nome correspondente.");
         return ResponseEntity.status(HttpStatus.OK).body(salaList);
     }
@@ -65,13 +57,7 @@ public class SalaService {
         logger.info("Buscando salas...");
 
         List<SalaModel> salaList = salaRepository.findByAberta(aberta);
-        if(!salaList.isEmpty()){
-            for(SalaModel sala : salaList){
-                Long id = sala.getId();
-                sala.add(linkTo(methodOn(ProfessorController.class).findById(id)).withSelfRel());
-            }
-        }
-        else
+        if(salaList.isEmpty())
             throw new ResourceNotFoundException("Nenhuma sala encontrada com esse aberta.");
         return ResponseEntity.status(HttpStatus.OK).body(salaList);
     }
@@ -83,10 +69,6 @@ public class SalaService {
         if (salaList.isEmpty()) {
             throw new ResourceNotFoundException("Nenhuma sala encontrada com o nome e status correspondente.");
         }
-        for (SalaModel sala : salaList) {
-            Long id = sala.getId();
-            sala.add(linkTo(methodOn(ProfessorController.class).findById(id)).withSelfRel());
-        }
         return ResponseEntity.status(HttpStatus.OK).body(salaList);
     }
 
@@ -94,13 +76,7 @@ public class SalaService {
 
         logger.info("Buscando salas...");
 
-       List<SalaModel> salaList = salaRepository.findAll();
-        if(!salaList.isEmpty()){
-            for(SalaModel sala : salaList){
-                Long id = sala.getId();
-                sala.add(linkTo(methodOn(SalaController.class).findById(id)).withSelfRel());
-            }
-        }
+        List<SalaModel> salaList = salaRepository.findAll();
         return ResponseEntity.status(HttpStatus.OK).body(salaList);
     }
     

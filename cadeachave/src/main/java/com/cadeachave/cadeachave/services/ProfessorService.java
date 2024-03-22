@@ -28,7 +28,6 @@ public class ProfessorService {
         logger.info("Buscando professor...");
 
         ProfessorModel professor = professorRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException("Nenhum professor encontrado com esse id."));
-        professor.add(linkTo(methodOn(ProfessorController.class).findAll()).withRel("Lista de professores"));
         return ResponseEntity.status(HttpStatus.OK).body(professor);
     }
 
@@ -39,7 +38,6 @@ public class ProfessorService {
         ProfessorModel professor = professorRepository.findByCpf(cpf);
         if(professor==null)
             throw new ResourceNotFoundException("Nenhum professor encontrado com esse CPF.");
-        professor.add(linkTo(methodOn(ProfessorController.class).findAll()).withRel("Lista de professores"));
         return ResponseEntity.status(HttpStatus.OK).body(professor);
     }
 
@@ -48,13 +46,7 @@ public class ProfessorService {
         logger.info("Buscando professor...");
 
         List<ProfessorModel> professorList = professorRepository.findByNome(name);
-        if(!professorList.isEmpty()){
-            for(ProfessorModel professor : professorList){
-                Long id = professor.getId();
-                professor.add(linkTo(methodOn(ProfessorController.class).findById(id)).withSelfRel());
-            }
-        }
-        else
+        if(professorList.isEmpty())
             throw new ResourceNotFoundException("Nenhum professor encontrado com esse Nome.");
         return ResponseEntity.status(HttpStatus.OK).body(professorList);
     }
@@ -66,10 +58,6 @@ public class ProfessorService {
         if (professorList.isEmpty()) {
             throw new ResourceNotFoundException("Nenhum professor encontrado com o CPF ou nome correspondente.");
         }
-        for (ProfessorModel professor : professorList) {
-            Long id = professor.getId();
-            professor.add(linkTo(methodOn(ProfessorController.class).findById(id)).withSelfRel());
-        }
         return ResponseEntity.status(HttpStatus.OK).body(professorList);
     }
 
@@ -78,12 +66,6 @@ public class ProfessorService {
         logger.info("Buscando professores...");
 
         List<ProfessorModel> professorList = professorRepository.findAll();
-        if(!professorList.isEmpty()){
-            for(ProfessorModel professor : professorList){
-                Long id = professor.getId();
-                professor.add(linkTo(methodOn(ProfessorController.class).findById(id)).withSelfRel());
-            }
-        }
         return ResponseEntity.status(HttpStatus.OK).body(professorList);
     }
     
@@ -97,6 +79,7 @@ public class ProfessorService {
         var entity = professorRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException("Nenhum professor encontrado com esse id."));
         entity.setNome(professor.getNome());
         entity.setCpf(professor.getCpf());
+        entity.setSalas(professor.getSalas());
         logger.info("Atualizando professor.");
         return ResponseEntity.status(HttpStatus.OK).body(professorRepository.save(entity));
     }
