@@ -6,6 +6,7 @@
   account_non_locked boolean DEFAULT NULL,
   credentials_non_expired boolean DEFAULT NULL,
   enabled boolean DEFAULT NULL,
+  professor_id INTEGER REFERENCES professores(id),
   PRIMARY KEY (id),
   CONSTRAINT uk_user_name UNIQUE (user_name)
 ) ;
