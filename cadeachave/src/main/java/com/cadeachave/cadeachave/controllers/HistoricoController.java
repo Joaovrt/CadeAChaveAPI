@@ -1,7 +1,6 @@
 package com.cadeachave.cadeachave.controllers;
 
 import java.util.List;
-import java.sql.Timestamp;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -11,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.cadeachave.cadeachave.models.HistoricoModel;
+import com.cadeachave.cadeachave.dtos.HistoricoResponseRecordDto;
 import com.cadeachave.cadeachave.services.HistoricoService;
 
 @RestController
@@ -22,19 +21,23 @@ public class HistoricoController {
     HistoricoService historicoService;
 
      @GetMapping()
-    public ResponseEntity<List <HistoricoModel>> findAll(){
+    public ResponseEntity<List <HistoricoResponseRecordDto>> findAll(){
         return historicoService.findAll();
     }
 
     @GetMapping(value="/{id}")
-    public ResponseEntity<HistoricoModel> findById(@PathVariable(value = "id") Long id){
+    public ResponseEntity<HistoricoResponseRecordDto> findById(@PathVariable(value = "id") Long id){
         return historicoService.findById(id);
     }
 
-    @GetMapping("/filtro")
-    public List<HistoricoModel> buscarHistoricoPorIntervaloDeDatas(
-            @RequestParam("dataInicial") Timestamp dataInicial,
-            @RequestParam("dataFinal") Timestamp dataFinal) {
-        return historicoService.buscarRegistrosPorIntervaloDeDatas(dataInicial, dataFinal);
-    }
+    @GetMapping("/filtro/{dataInicial}/{dataFinal}")
+    public ResponseEntity<List<HistoricoResponseRecordDto>> buscarHistoricoPorIntervaloDeDatas(
+            @PathVariable(value = "dataInicial") String dataInicial,
+            @PathVariable(value = "dataFinal") String dataFinal,
+            @RequestParam(value = "professorId", required = false) Long professorId,
+            @RequestParam(value = "salaId", required = false) Long salaId,
+            @RequestParam(value = "abriu", required = false) Boolean abriu) {
+
+    return historicoService.buscarHistoricoComFiltro(dataInicial, dataFinal, professorId, salaId, abriu);
+}
 }

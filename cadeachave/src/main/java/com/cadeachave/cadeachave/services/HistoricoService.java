@@ -2,14 +2,21 @@ package com.cadeachave.cadeachave.services;
 
 import java.util.List;
 import java.util.logging.Logger;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.sql.Timestamp;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import com.cadeachave.cadeachave.dtos.HistoricoResponseRecordDto;
+import com.cadeachave.cadeachave.dtos.ProfessorWithoutSalasRecordDto;
+import com.cadeachave.cadeachave.exceptions.ResourceBadRequestException;
 import com.cadeachave.cadeachave.exceptions.ResourceNotFoundException;
 import com.cadeachave.cadeachave.models.HistoricoModel;
 import com.cadeachave.cadeachave.models.ProfessorModel;
@@ -24,25 +31,24 @@ public class HistoricoService {
     @Autowired
     HistoricoRepository historicoRepository;
 
-    public ResponseEntity<HistoricoModel> findById(Long id){
-
-        logger.info("Buscando historico...");
-
-        HistoricoModel historico = historicoRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException("Nenhuma historico encontrado com esse id."));
-        return ResponseEntity.status(HttpStatus.OK).body(historico);
+    public ResponseEntity<HistoricoResponseRecordDto> findById(Long id){
+        HistoricoModel historico = historicoRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException("Nenhuma historico encontrado com o id: "+id));
+        HistoricoResponseRecordDto historicoResponse = convertToHistoricoResponseRecordDto(historico);
+        
+        return ResponseEntity.status(HttpStatus.OK).body(historicoResponse);
     }
 
-    public ResponseEntity<List<HistoricoModel>> findAll(){
-
-        logger.info("Buscando historico...");
-
+    public ResponseEntity<List<HistoricoResponseRecordDto>> findAll(){
         List<HistoricoModel> historicoList = historicoRepository.findAll();
-        return ResponseEntity.status(HttpStatus.OK).body(historicoList);
+        List<HistoricoResponseRecordDto> historicoResponseList = new ArrayList<HistoricoResponseRecordDto>();
+        for (HistoricoModel historico : historicoList) {
+            historicoResponseList.add(convertToHistoricoResponseRecordDto(historico));
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(historicoResponseList);
     }
     
     public ResponseEntity<HistoricoModel> create (ProfessorModel professor, SalaModel sala, boolean abriu){
-
-        logger.info("Cadastrando historico.");
         HistoricoModel historico = new HistoricoModel();
         historico.setProfessor(professor);
         historico.setSala(sala);
@@ -52,9 +58,25 @@ public class HistoricoService {
         return ResponseEntity.status(HttpStatus.CREATED).body(historicoRepository.save(historico));
     }
 
-    public List<HistoricoModel> buscarRegistrosPorIntervaloDeDatas(Timestamp dataInicial, Timestamp dataFinal) {
-        return historicoRepository.findByHorarioBetween(dataInicial, dataFinal);
+    public ResponseEntity<List<HistoricoResponseRecordDto>> buscarHistoricoComFiltro(String dataInicial, String dataFinal, Long professorId, Long salaId, Boolean abriu) {
+        try {
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            Timestamp dataHoraInicial = new Timestamp(dateFormat.parse(dataInicial).getTime());
+            Timestamp dataHoraFinal = new Timestamp(dateFormat.parse(dataFinal).getTime());
+    
+            List<HistoricoModel> historicoList = historicoRepository.findByHorarioBetweenAndProfessorIdAndSalaIdAndAbriu(dataHoraInicial, dataHoraFinal, professorId, salaId, abriu);
+            List<HistoricoResponseRecordDto> historicoResponseList = new ArrayList<>();
+    
+            for (HistoricoModel historico : historicoList) {
+                historicoResponseList.add(convertToHistoricoResponseRecordDto(historico));
+            }
+    
+            return ResponseEntity.status(HttpStatus.OK).body(historicoResponseList);
+        } catch (ParseException e) {
+            throw new ResourceBadRequestException("Formato de data incorreto, insira (yyyy-MM-dd HH:mm:ss)");
+        }
     }
+    
 
     public boolean validaUltimoAAbrir(ProfessorModel professor, SalaModel sala){
         List<HistoricoModel> historicoList = historicoRepository.findBySalaAndAbriu(sala, true);
@@ -65,5 +87,20 @@ public class HistoricoService {
                 return true;
         }
         return false;
+    }
+
+     private HistoricoResponseRecordDto convertToHistoricoResponseRecordDto(HistoricoModel historico) {
+        ProfessorModel professor = historico.getProfessor();
+        return new HistoricoResponseRecordDto(
+                historico.getId(),
+                new ProfessorWithoutSalasRecordDto(
+                        professor.getId(),
+                        professor.getNome(),
+                        professor.getCpf()
+                ),
+                historico.getSala(),
+                historico.getHorario(),
+                historico.isAbriu()
+        );
     }
 }

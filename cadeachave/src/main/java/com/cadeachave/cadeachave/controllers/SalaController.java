@@ -57,7 +57,7 @@ public class SalaController {
         return salaService.findByAberta(aberta);
     }
 
-    @GetMapping(value="/nomeEAberta/{nome}/{aberta}")
+    @GetMapping(value="/nomeComEAberta/{nome}/{aberta}")
     public ResponseEntity<List<SalaModel>> findByNomeContainingAndAberta(@PathVariable(value = "nome") String nome, @PathVariable(value = "aberta") boolean aberta) {
         return salaService.findByNomeContainingAndAberta(nome,aberta);
     }
@@ -72,13 +72,13 @@ public class SalaController {
         return salaService.delete(id);
     }
 
-    // @PostMapping("/abrir/{cpf}/{nome}")
-    // public ResponseEntity<HistoricoModel> abrir(@PathVariable(value = "cpf") String cpf, @PathVariable(value = "nome") String nome) {
-    //     return salaService.Abrir(cpf, nome);
-    // }
+    @PostMapping("/abrir/{cpf}/{nome}")
+    public ResponseEntity<HistoricoModel> abrir(@PathVariable(value = "cpf") String cpf, @PathVariable(value = "nome") String nome) {
+        return salaService.Abrir(cpf, nome);
+    }
 
-    // @PostMapping("/fechar/{cpf}/{nome}")
-    // public ResponseEntity<HistoricoModel> fechar(@PathVariable(value = "cpf") String cpf, @PathVariable(value = "nome") String nome) {
-    //     return salaService.Fechar(cpf, nome);
-    // }
+    @PostMapping("/fechar/{cpf}/{nome}")
+    public ResponseEntity<HistoricoModel> fechar(@PathVariable(value = "cpf") String cpf, @PathVariable(value = "nome") String nome) {
+        return salaService.Fechar(cpf, nome);
+    }
 }

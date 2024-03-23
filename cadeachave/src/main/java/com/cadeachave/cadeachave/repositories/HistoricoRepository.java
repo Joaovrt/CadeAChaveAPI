@@ -13,5 +13,11 @@ import com.cadeachave.cadeachave.models.SalaModel;
 @Repository
 public interface HistoricoRepository extends JpaRepository<HistoricoModel, Long>{
     List<HistoricoModel> findBySalaAndAbriu(SalaModel sala, boolean abriu);
-    List<HistoricoModel> findByHorarioBetween(Timestamp dataInicial, Timestamp dataFinal);
+    List<HistoricoModel> findByHorarioBetweenAndProfessorIdAndSalaIdAndAbriu(
+        Timestamp dataInicial, 
+        Timestamp dataFinal, 
+        Long professorId, 
+        Long salaId, 
+        Boolean abriu
+    );
 }
