@@ -2,6 +2,8 @@ package com.cadeachave.cadeachave.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -17,12 +19,8 @@ import com.cadeachave.cadeachave.repositories.ProfessorRepository;
 import com.cadeachave.cadeachave.repositories.SalaRepository;
 
 
-import java.util.List;
-import java.util.logging.Logger;
-
 @Service
 public class SalaService {
-    private Logger logger = Logger.getLogger(SalaService.class.getName());
 
     @Autowired
     SalaRepository salaRepository;
@@ -45,31 +43,30 @@ public class SalaService {
         return ResponseEntity.status(HttpStatus.OK).body(sala);
     }
 
-    public ResponseEntity<List<SalaModel>> findByNomeContaining(String termo){
-       List<SalaModel> salaList = salaRepository.findByNomeContaining(termo);
-        if(salaList.isEmpty())
+    public Page<SalaModel> findByNomeContaining(String termo, Pageable pageable){
+        var salaPage = salaRepository.findByNomeContaining(termo, pageable);
+        if(salaPage.isEmpty())
             throw new ResourceNotFoundException("Nenhuma sala encontrada com o nome contendo: "+termo);
-        return ResponseEntity.status(HttpStatus.OK).body(salaList);
+        return salaPage;
     }
 
-    public ResponseEntity<List<SalaModel>> findByAberta(boolean aberta){
-        List<SalaModel> salaList = salaRepository.findByAberta(aberta);
-        if(salaList.isEmpty())
+    public Page<SalaModel>  findByAberta(boolean aberta, Pageable pageable){
+        var salaPage = salaRepository.findByAberta(aberta, pageable);
+        if(salaPage.isEmpty())
             throw new ResourceNotFoundException("Nenhuma sala encontrada "+ (aberta ? "aberta" : "fechada"));
-        return ResponseEntity.status(HttpStatus.OK).body(salaList);
+        return salaPage;
     }
 
-    public ResponseEntity<List<SalaModel>> findByNomeContainingAndAberta(String nome, boolean aberta) {
-        List<SalaModel> salaList = salaRepository.findByNomeContainingAndAberta(nome, aberta);
-        if (salaList.isEmpty()) {
+    public Page<SalaModel> findByNomeContainingAndAberta(String nome, boolean aberta, Pageable pageable) {
+        var salaPage = salaRepository.findByNomeContainingAndAberta(nome, aberta, pageable);
+        if (salaPage.isEmpty()) {
             throw new ResourceNotFoundException("Nenhuma sala encontrada com contendo o nome: "+nome+" e status correspondente a "+(aberta ? "aberta" : "fechada"));
         }
-        return ResponseEntity.status(HttpStatus.OK).body(salaList);
+        return salaPage;
     }
 
-    public ResponseEntity<List<SalaModel>> findAll(){
-        List<SalaModel> salaList = salaRepository.findAll();
-        return ResponseEntity.status(HttpStatus.OK).body(salaList);
+    public Page<SalaModel> findAll(Pageable pageable){
+        return salaRepository.findAll(pageable);
     }
     
     public ResponseEntity<SalaModel> create (SalaRecordDto salaDto){

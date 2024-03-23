@@ -2,6 +2,8 @@ package com.cadeachave.cadeachave.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -16,11 +18,9 @@ import com.cadeachave.cadeachave.repositories.SalaRepository;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
 @Service
 public class ProfessorService {
-    private Logger logger = Logger.getLogger(ProfessorService.class.getName());
 
     @Autowired
     ProfessorRepository professorRepository;
@@ -47,17 +47,16 @@ public class ProfessorService {
         return ResponseEntity.status(HttpStatus.OK).body(professorList);
     }
 
-    public ResponseEntity<List<ProfessorModel>> findByCpfOrNomeContaining(String termo) {
-        List<ProfessorModel> professorList = professorRepository.findByCpfContainingOrNomeContaining(termo, termo);
+    public Page<ProfessorModel> findByCpfOrNomeContaining(String termo, Pageable pageable) {
+        var professorList = professorRepository.findByCpfContainingOrNomeContaining(termo, termo, pageable);
         if (professorList.isEmpty()) {
             throw new ResourceNotFoundException("Nenhum professor encontrado com o CPF ou nome contendo: " + termo);
         }
-        return ResponseEntity.status(HttpStatus.OK).body(professorList);
+        return professorList;
     }
 
-    public ResponseEntity<List<ProfessorModel>> findAll(){
-        List<ProfessorModel> professorList = professorRepository.findAll();
-        return ResponseEntity.status(HttpStatus.OK).body(professorList);
+    public Page<ProfessorModel> findAll(Pageable pageable){
+        return professorRepository.findAll(pageable);
     }
     
     public ResponseEntity<ProfessorModel> create(ProfessorRecordDto professorDto) {

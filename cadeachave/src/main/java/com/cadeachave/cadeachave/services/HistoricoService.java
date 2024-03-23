@@ -10,6 +10,9 @@ import java.text.SimpleDateFormat;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -38,14 +41,15 @@ public class HistoricoService {
         return ResponseEntity.status(HttpStatus.OK).body(historicoResponse);
     }
 
-    public ResponseEntity<List<HistoricoResponseRecordDto>> findAll(){
-        List<HistoricoModel> historicoList = historicoRepository.findAll();
-        List<HistoricoResponseRecordDto> historicoResponseList = new ArrayList<HistoricoResponseRecordDto>();
-        for (HistoricoModel historico : historicoList) {
-            historicoResponseList.add(convertToHistoricoResponseRecordDto(historico));
+    public Page<HistoricoResponseRecordDto> findAll(Pageable pageable){
+        var historicoPage = historicoRepository.findAll(pageable);
+        List<HistoricoResponseRecordDto> historicoDtoList = new ArrayList<>();
+        for (int i = 0; i < historicoPage.getContent().size(); i++) {
+            HistoricoResponseRecordDto dto = convertToHistoricoResponseRecordDto(historicoPage.getContent().get(i));
+            historicoDtoList.add(dto);
         }
-
-        return ResponseEntity.status(HttpStatus.OK).body(historicoResponseList);
+        Page<HistoricoResponseRecordDto> historicoDtoPage = new PageImpl<>(historicoDtoList, historicoPage.getPageable(), historicoPage.getTotalElements());
+        return historicoDtoPage;
     }
     
     public ResponseEntity<HistoricoModel> create (ProfessorModel professor, SalaModel sala, boolean abriu){
@@ -58,20 +62,22 @@ public class HistoricoService {
         return ResponseEntity.status(HttpStatus.CREATED).body(historicoRepository.save(historico));
     }
 
-    public ResponseEntity<List<HistoricoResponseRecordDto>> buscarHistoricoComFiltro(String dataInicial, String dataFinal, Long professorId, Long salaId, Boolean abriu) {
+    public Page<HistoricoResponseRecordDto> buscarHistoricoComFiltro(String dataInicial, String dataFinal, Long professorId, Long salaId, Boolean abriu, Pageable pageable) {
         try {
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             Timestamp dataHoraInicial = new Timestamp(dateFormat.parse(dataInicial).getTime());
             Timestamp dataHoraFinal = new Timestamp(dateFormat.parse(dataFinal).getTime());
-    
-            List<HistoricoModel> historicoList = historicoRepository.findByHorarioBetweenAndProfessorIdAndSalaIdAndAbriu(dataHoraInicial, dataHoraFinal, professorId, salaId, abriu);
-            List<HistoricoResponseRecordDto> historicoResponseList = new ArrayList<>();
-    
-            for (HistoricoModel historico : historicoList) {
-                historicoResponseList.add(convertToHistoricoResponseRecordDto(historico));
+
+            Page<HistoricoModel> historicoPage = historicoRepository.buscarHistoricoComFiltro(dataHoraInicial, dataHoraFinal, professorId, salaId, abriu, pageable);
+            logger.info(historicoPage.toString());
+
+            List<HistoricoResponseRecordDto> historicoDtoList = new ArrayList<>();
+            for (HistoricoModel historicoModel : historicoPage.getContent()) {
+                HistoricoResponseRecordDto dto = convertToHistoricoResponseRecordDto(historicoModel);
+                historicoDtoList.add(dto);
             }
-    
-            return ResponseEntity.status(HttpStatus.OK).body(historicoResponseList);
+
+            return new PageImpl<>(historicoDtoList, historicoPage.getPageable(), historicoPage.getTotalElements());
         } catch (ParseException e) {
             throw new ResourceBadRequestException("Formato de data incorreto, insira (yyyy-MM-dd HH:mm:ss)");
         }
