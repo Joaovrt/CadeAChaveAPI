@@ -1,7 +1,5 @@
 package com.cadeachave.cadeachave.controllers;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -102,12 +100,12 @@ public class SalaController {
         return salaService.delete(id);
     }
 
-    @PostMapping("/abrir/{cpf}/{nome}")
+    @PostMapping("/abrir/{nome}/{cpf}")
     public ResponseEntity<HistoricoModel> abrir(@PathVariable(value = "cpf") String cpf, @PathVariable(value = "nome") String nome) {
         return salaService.Abrir(cpf, nome);
     }
 
-    @PostMapping("/fechar/{cpf}/{nome}")
+    @PostMapping("/fechar/{nome}/{cpf}")
     public ResponseEntity<HistoricoModel> fechar(@PathVariable(value = "cpf") String cpf, @PathVariable(value = "nome") String nome) {
         return salaService.Fechar(cpf, nome);
     }
