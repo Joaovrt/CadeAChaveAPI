@@ -8,6 +8,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import com.cadeachave.cadeachave.exceptions.ExceptionResponse;
 import com.cadeachave.cadeachave.exceptions.ResourceBadRequestException;
 import com.cadeachave.cadeachave.exceptions.ResourceConflictException;
+import com.cadeachave.cadeachave.exceptions.ResourceForbiddenException;
 import com.cadeachave.cadeachave.exceptions.ResourceNotFoundException;
 import com.cadeachave.cadeachave.exceptions.ResourceUnauthorizedException;
 
@@ -48,5 +49,12 @@ public class CustomizedResponseEntityExceptionHandler extends ResponseEntityExce
     public final ResponseEntity<ExceptionResponse> handleUnauthorizedExceptions(Exception ex, WebRequest request){
         ExceptionResponse exceptionResponse = new ExceptionResponse(new Date(), ex.getMessage(), request.getDescription(false));
         return new ResponseEntity<>(exceptionResponse, HttpStatus.UNAUTHORIZED);
+    }
+
+    
+    @ExceptionHandler(ResourceForbiddenException.class)
+    public final ResponseEntity<ExceptionResponse> handleForbiddenExceptions(Exception ex, WebRequest request){
+        ExceptionResponse exceptionResponse = new ExceptionResponse(new Date(), ex.getMessage(), request.getDescription(false));
+        return new ResponseEntity<>(exceptionResponse, HttpStatus.FORBIDDEN);
     }
 }

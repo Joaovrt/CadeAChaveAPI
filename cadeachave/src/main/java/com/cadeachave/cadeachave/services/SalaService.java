@@ -8,11 +8,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import com.cadeachave.cadeachave.dtos.HistoricoResponseRecordDto;
 import com.cadeachave.cadeachave.dtos.SalaRecordDto;
 import com.cadeachave.cadeachave.exceptions.ResourceConflictException;
+import com.cadeachave.cadeachave.exceptions.ResourceForbiddenException;
 import com.cadeachave.cadeachave.exceptions.ResourceNotFoundException;
 import com.cadeachave.cadeachave.exceptions.ResourceUnauthorizedException;
-import com.cadeachave.cadeachave.models.HistoricoModel;
 import com.cadeachave.cadeachave.models.ProfessorModel;
 import com.cadeachave.cadeachave.models.SalaModel;
 import com.cadeachave.cadeachave.repositories.ProfessorRepository;
@@ -100,7 +101,7 @@ public class SalaService {
         return ResponseEntity.status(HttpStatus.OK).body("Sala deletada.");
     }
 
-    public ResponseEntity<HistoricoModel> Abrir(String cpf, String nome){
+    public ResponseEntity<HistoricoResponseRecordDto> Abrir(String cpf, String nome){
         ProfessorModel professor = professorRepository.findByCpf(cpf);
         if(professor==null)
             throw new ResourceNotFoundException("Nenhum professor encontrado com o CPF: "+cpf);
@@ -117,10 +118,10 @@ public class SalaService {
             }
         }
         else
-            throw new ResourceUnauthorizedException("Professor com cpf: "+cpf+" não tem permissão de acesso à sala "+nome);
+            throw new ResourceForbiddenException("Professor com cpf: "+cpf+" não tem permissão de acesso à sala "+nome);
     }
 
-    public ResponseEntity<HistoricoModel> Fechar(String cpf, String nome){
+    public ResponseEntity<HistoricoResponseRecordDto> Fechar(String cpf, String nome){
         ProfessorModel professor = professorRepository.findByCpf(cpf);
         if(professor==null)
             throw new ResourceNotFoundException("Nenhum professor encontrado com o CPF: "+cpf);
@@ -141,6 +142,6 @@ public class SalaService {
             }
         }
         else
-        throw new ResourceUnauthorizedException("Professor com cpf: "+cpf+" não tem permissão de acesso à sala "+nome);
+        throw new ResourceForbiddenException("Professor com cpf: "+cpf+" não tem permissão de acesso à sala "+nome);
     }
 }

@@ -17,8 +17,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.cadeachave.cadeachave.dtos.HistoricoResponseRecordDto;
 import com.cadeachave.cadeachave.dtos.SalaRecordDto;
-import com.cadeachave.cadeachave.models.HistoricoModel;
 import com.cadeachave.cadeachave.models.SalaModel;
 import com.cadeachave.cadeachave.services.SalaService;
 
@@ -100,13 +100,13 @@ public class SalaController {
         return salaService.delete(id);
     }
 
-    @PostMapping("/abrir/{nome}/{cpf}")
-    public ResponseEntity<HistoricoModel> abrir(@PathVariable(value = "cpf") String cpf, @PathVariable(value = "nome") String nome) {
+    @GetMapping("/abrir/{nome}/{cpf}")
+    public ResponseEntity<HistoricoResponseRecordDto> abrir(@PathVariable(value = "cpf") String cpf, @PathVariable(value = "nome") String nome) {
         return salaService.Abrir(cpf, nome);
     }
 
-    @PostMapping("/fechar/{nome}/{cpf}")
-    public ResponseEntity<HistoricoModel> fechar(@PathVariable(value = "cpf") String cpf, @PathVariable(value = "nome") String nome) {
+    @GetMapping("/fechar/{nome}/{cpf}")
+    public ResponseEntity<HistoricoResponseRecordDto> fechar(@PathVariable(value = "cpf") String cpf, @PathVariable(value = "nome") String nome) {
         return salaService.Fechar(cpf, nome);
     }
 }

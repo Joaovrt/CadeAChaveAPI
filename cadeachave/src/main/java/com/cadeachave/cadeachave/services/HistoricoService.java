@@ -52,14 +52,14 @@ public class HistoricoService {
         return historicoDtoPage;
     }
     
-    public ResponseEntity<HistoricoModel> create (ProfessorModel professor, SalaModel sala, boolean abriu){
+    public ResponseEntity<HistoricoResponseRecordDto> create (ProfessorModel professor, SalaModel sala, boolean abriu){
         HistoricoModel historico = new HistoricoModel();
         historico.setProfessor(professor);
         historico.setSala(sala);
         historico.setAbriu(abriu);
         historico.setHorario(new Timestamp(System.currentTimeMillis()));
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(historicoRepository.save(historico));
+        var historicoDtoCreated = convertToHistoricoResponseRecordDto(historicoRepository.save(historico));
+        return ResponseEntity.status(HttpStatus.OK).body(historicoDtoCreated);
     }
 
     public Page<HistoricoResponseRecordDto> buscarHistoricoComFiltro(String dataInicial, String dataFinal, Long professorId, Long salaId, Boolean abriu, Pageable pageable) {
