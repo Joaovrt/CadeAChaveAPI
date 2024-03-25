@@ -1,0 +1,36 @@
+version: '2'
+
+services:
+  db:
+    image: 'postgres:latest'
+    container_name: db
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=123
+    ports:
+      - 5432:5432
+    expose:
+      - 5432
+    networks:
+      - cac-network
+  app:
+    image: 'docker-spring-boot-postgres:latest'
+    build:
+      context: .
+    container_name: app
+    depends_on:
+      - db
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/postgres
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=123
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=none
+    ports:
+      - 8080:8080
+    expose:
+      - 8080
+    networks:
+      - cac-network
+networks:
+  cac-network:
+    driver: bridge
