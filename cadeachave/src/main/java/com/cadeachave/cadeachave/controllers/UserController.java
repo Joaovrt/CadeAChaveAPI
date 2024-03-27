@@ -2,8 +2,9 @@ package com.cadeachave.cadeachave.controllers;
 
 import org.springframework.web.bind.annotation.RestController;
 
-import com.cadeachave.cadeachave.dtos.AuthenticationDto;
-import com.cadeachave.cadeachave.dtos.RegisterDto;
+import com.cadeachave.cadeachave.dtos.AuthenticationRecordDto;
+import com.cadeachave.cadeachave.dtos.RegisterRecordDto;
+import com.cadeachave.cadeachave.dtos.UpdateUserRecordDto;
 import com.cadeachave.cadeachave.models.UserModel;
 import com.cadeachave.cadeachave.services.UserService;
 
@@ -33,12 +34,12 @@ public class UserController {
     UserService userService;
 
      @PostMapping("/login")
-    public ResponseEntity<Object> login(@RequestBody @Valid AuthenticationDto data){
+    public ResponseEntity<Object> login(@RequestBody @Valid AuthenticationRecordDto data){
        return userService.login(data);
     }
 
     @PostMapping()
-    public ResponseEntity<Object> register(@RequestBody @Valid RegisterDto data){
+    public ResponseEntity<Object> register(@RequestBody @Valid RegisterRecordDto data){
        return userService.register(data);
     }
 
@@ -59,8 +60,8 @@ public class UserController {
     }
 
     @PutMapping(value="/{id}")
-    public ResponseEntity<UserModel> update(@PathVariable(value = "id") String id, @RequestBody @Valid RegisterDto registerDto){
-        return userService.update(registerDto, id);
+    public ResponseEntity<UserModel> update(@PathVariable(value = "id") String id, @RequestBody @Valid UpdateUserRecordDto updateDto){
+        return userService.update(updateDto, id);
     }
 
     @DeleteMapping(value="/{id}")

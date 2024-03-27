@@ -1,5 +1,7 @@
 package com.cadeachave.cadeachave.services;
 
+import java.util.logging.Logger;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
@@ -10,26 +12,27 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import com.cadeachave.cadeachave.configuration.security.TokenService;
-import com.cadeachave.cadeachave.dtos.AuthenticationDto;
-import com.cadeachave.cadeachave.dtos.LoginResponseDto;
-import com.cadeachave.cadeachave.dtos.RegisterDto;
-import com.cadeachave.cadeachave.dtos.SalaRecordDto;
+import com.cadeachave.cadeachave.dtos.AuthenticationRecordDto;
+import com.cadeachave.cadeachave.dtos.LoginResponseRecordDto;
+import com.cadeachave.cadeachave.dtos.RegisterRecordDto;
+import com.cadeachave.cadeachave.dtos.UpdateUserRecordDto;
 import com.cadeachave.cadeachave.exceptions.ResourceBadRequestException;
 import com.cadeachave.cadeachave.exceptions.ResourceConflictException;
 import com.cadeachave.cadeachave.exceptions.ResourceNotFoundException;
 import com.cadeachave.cadeachave.models.ProfessorModel;
-import com.cadeachave.cadeachave.models.SalaModel;
 import com.cadeachave.cadeachave.models.UserModel;
 import com.cadeachave.cadeachave.repositories.ProfessorRepository;
 import com.cadeachave.cadeachave.repositories.UserRepository;
 
-import jakarta.validation.Valid;
+
 
 @Service
 public class UserService {
+
+    //private Logger logger = Logger.getLogger(UserService.class.getName());
+
     @Autowired
     private AuthenticationManager authenticationManager;
     @Autowired
@@ -52,29 +55,29 @@ public class UserService {
         return users;
     }
 
-    public ResponseEntity<UserModel> update (RegisterDto registerDto, String id){
+    public ResponseEntity<UserModel> update (UpdateUserRecordDto updateDto, String id){
         try{
             var entity = userRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException("Nenhum usuario encontrado com esse id."));
             ProfessorModel professor = null;
-            if(registerDto.professor_id()!=null){
-                professor = professorRepository.findById(registerDto.professor_id()).orElseThrow(()-> new ResourceNotFoundException("Nenhum professor encontrado com esse id: "+registerDto.professor_id()));
+            if(updateDto.professor_id()!=null){
+                professor = professorRepository.findById(updateDto.professor_id()).orElseThrow(()-> new ResourceNotFoundException("Nenhum professor encontrado com esse id: "+updateDto.professor_id()));
                 var userWithProfessor = userRepository.findByProfessor(professor);
                 if(userWithProfessor!=null&&userWithProfessor.getId()!=id)
                     throw new ResourceBadRequestException("Professor ja cadastrado como usuario.");
             }
             entity.setProfessor(professor);
-            entity.setLogin(registerDto.login());
-            if(registerDto.password()!=entity.getPassword()){
-                String encryptedPassword = new BCryptPasswordEncoder().encode(registerDto.password());
+            entity.setLogin(updateDto.login());
+            if(updateDto.password()!=null){
+                String encryptedPassword = new BCryptPasswordEncoder().encode(updateDto.password());
                 entity.setPassword(encryptedPassword);
             }
-            entity.setRole(registerDto.role());
+            entity.setRole(updateDto.role());
             var savedUser = userRepository.save(entity);
             savedUser.setPassword(null); 
             return ResponseEntity.status(HttpStatus.OK).body(savedUser);
         }
         catch (DataIntegrityViolationException e) {
-            throw new ResourceConflictException("Outro usuario já está cadastrado com esse login: " + registerDto.login());
+            throw new ResourceConflictException("Outro usuario já está cadastrado com esse login: " + updateDto.login());
         }
     }
 
@@ -84,16 +87,16 @@ public class UserService {
         return ResponseEntity.status(HttpStatus.OK).body("Usuario deletada.");
     }
 
-    public ResponseEntity<Object> login(AuthenticationDto data){
+    public ResponseEntity<Object> login(AuthenticationRecordDto data){
          var usernamePassword = new UsernamePasswordAuthenticationToken(data.login(), data.password());
         var auth = this.authenticationManager.authenticate(usernamePassword);
 
         var token = tokenService.generateToken((UserModel) auth.getPrincipal());
 
-        return ResponseEntity.ok(new LoginResponseDto(token));
+        return ResponseEntity.ok(new LoginResponseRecordDto(token));
     }
 
-    public ResponseEntity<Object> register(RegisterDto data){
+    public ResponseEntity<Object> register(RegisterRecordDto data){
         if(this.userRepository.findByLogin(data.login()) != null) throw new ResourceBadRequestException("Usuario ja cadastrado.");
         ProfessorModel professor = null;
         if(data.professor_id()!=null){
