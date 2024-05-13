@@ -111,13 +111,13 @@ public class SalaService {
         if(sala==null||sala.isAtivo()!=true)
             throw new ResourceNotFoundException("Nenhuma sala encontrada com o nome: " +nome);
         if(professor.getSalas().contains(sala)){
-            if(sala.isAberta())
-                throw new ResourceConflictException("Sala "+nome+" já está aberta.");
-            else{
+            // if(sala.isAberta())
+            //     throw new ResourceConflictException("Sala "+nome+" já está aberta.");
+            // else{
                 sala.setAberta(true);
                 salaRepository.save(sala);
                 return historicoService.create(professor, sala, true);
-            }
+            // }
         }
         else
             throw new ResourceForbiddenException("Professor com cpf: "+cpf+" não tem permissão de acesso à sala "+nome);
@@ -131,9 +131,9 @@ public class SalaService {
         if(sala==null||sala.isAtivo()!=true)
             throw new ResourceNotFoundException("Nenhuma sala encontrada com o nome: " +nome);
         if(professor.getSalas().contains(sala)){
-            if(!sala.isAberta())
-            throw new ResourceConflictException("Sala "+nome+" já está fechada.");
-            else{
+            // if(!sala.isAberta())
+            // throw new ResourceConflictException("Sala "+nome+" já está fechada.");
+            // else{
                 if(historicoService.validaUltimoAAbrir(professor, sala)){
                     sala.setAberta(false);
                     salaRepository.save(sala);
@@ -141,7 +141,7 @@ public class SalaService {
                 }
                 else
                 throw new ResourceUnauthorizedException("Professor com cpf: "+cpf+" não foi o último a abrir a sala "+nome);
-            }
+            // }
         }
         else
         throw new ResourceForbiddenException("Professor com cpf: "+cpf+" não tem permissão de acesso à sala "+nome);
