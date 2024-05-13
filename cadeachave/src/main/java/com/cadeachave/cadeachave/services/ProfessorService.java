@@ -18,9 +18,12 @@ import com.cadeachave.cadeachave.repositories.SalaRepository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 @Service
 public class ProfessorService {
+
+    private Logger logger = Logger.getLogger(ProfessorService.class.getName());
 
     @Autowired
     ProfessorRepository professorRepository;
@@ -47,8 +50,8 @@ public class ProfessorService {
         return ResponseEntity.status(HttpStatus.OK).body(professorList);
     }
 
-    public Page<ProfessorModel> findByCpfOrNomeContaining(String termo, Pageable pageable) {
-        var professorList = professorRepository.findByCpfContainingIgnoreCaseOrNomeContainingIgnoreCase(termo, termo, pageable);
+    public Page<ProfessorModel> findByCpfOrNomeContaining(String termo, Pageable pageable, Boolean ativo) {
+        var professorList = professorRepository.findByCpfContainingIgnoreCaseOrNomeContainingIgnoreCaseAndAtivo(termo, termo, ativo, pageable);
         if (professorList.isEmpty()) {
             throw new ResourceNotFoundException("Nenhum professor encontrado com o CPF ou nome contendo: " + termo);
         }
@@ -64,6 +67,7 @@ public class ProfessorService {
             ProfessorModel professor = new ProfessorModel();
             professor.setNome(professorDto.nome());
             professor.setCpf(professorDto.cpf());
+            professor.setAtivo(professorDto.ativo());
             if (!professorDto.salas().isEmpty()) {
                 List<SalaModel> salaList = new ArrayList<>();
                 for (Long i : professorDto.salas()) {
@@ -86,6 +90,7 @@ public class ProfessorService {
             var entity = professorRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException("Nenhum professor encontrado com esse id."));
             entity.setNome(professorDto.nome());
             entity.setCpf(professorDto.cpf());
+            entity.setAtivo(professorDto.ativo());
             if (!professorDto.salas().isEmpty()) {
                 List<SalaModel> salaList = new ArrayList<>();
                 for (Long i : professorDto.salas()) {

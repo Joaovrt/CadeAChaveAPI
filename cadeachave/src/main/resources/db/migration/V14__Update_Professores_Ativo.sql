@@ -1,0 +1,1 @@
+update professores set ativo=true;

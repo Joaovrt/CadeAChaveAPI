@@ -1,0 +1,1 @@
+alter table professores add column ativo boolean;

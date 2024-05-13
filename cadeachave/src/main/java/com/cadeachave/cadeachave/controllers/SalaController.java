@@ -79,15 +79,17 @@ public class SalaController {
         return ResponseEntity.ok(salaService.findByAberta(aberta,pageable));
     }
 
-    @GetMapping(value="/nomeComEAberta/{nome}/{aberta}")
-    public ResponseEntity<Page<SalaModel>> findByNomeContainingAndAberta(@PathVariable(value = "nome") String nome, @PathVariable(value = "aberta") boolean aberta,
+    @GetMapping(value="/nomeComEAberta/{nome}")
+    public ResponseEntity<Page<SalaModel>> findByNomeContainingAndAberta(@PathVariable(value = "nome") String nome, 
+        @RequestParam(value = "aberta", required = false) Boolean aberta,
+        @RequestParam(value = "ativo", required = false) Boolean ativo,
         @RequestParam(value = "page", defaultValue = "0") Integer page,
         @RequestParam(value = "size", defaultValue = "15") Integer size,
         @RequestParam(value = "direction", defaultValue = "asc") String direction
     ) {
         var sortDirection = "desc".equalsIgnoreCase(direction) ? Direction.DESC : Direction.ASC;
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortDirection,"nome"));
-        return ResponseEntity.ok(salaService.findByNomeContainingAndAberta(nome,aberta,pageable));
+        return ResponseEntity.ok(salaService.findByNomeContainingAndAberta(nome,aberta,ativo,pageable));
     }
 
     @PutMapping(value="/{id}")

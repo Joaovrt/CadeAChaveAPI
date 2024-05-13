@@ -29,6 +29,9 @@ public class ProfessorModel implements Serializable {
     @Column(nullable = false, unique = true, length = 11)
     private String cpf;
 
+    @Column
+    private boolean ativo;
+
     @ManyToMany
     @JoinTable(
         name = "professores_salas",
@@ -61,12 +64,32 @@ public class ProfessorModel implements Serializable {
         this.cpf = cpf;
     }
 
+    public boolean isAtivo() {
+        return ativo;
+    }
+
+    public void setAtivo(boolean ativo) {
+        this.ativo = ativo;
+    }
+
     public List<SalaModel> getSalas() {
         return salas;
     }
 
     public void setSalas(List<SalaModel> salas) {
         this.salas = salas;
+    }
+
+    public ProfessorModel(Long id, String nome, String cpf, boolean ativo, List<SalaModel> salas) {
+        this.id = id;
+        this.nome = nome;
+        this.cpf = cpf;
+        this.ativo = ativo;
+        this.salas = salas;
+    }
+
+    public ProfessorModel() {
+        
     }
 
     @Override
@@ -76,6 +99,7 @@ public class ProfessorModel implements Serializable {
         result = prime * result + ((id == null) ? 0 : id.hashCode());
         result = prime * result + ((nome == null) ? 0 : nome.hashCode());
         result = prime * result + ((cpf == null) ? 0 : cpf.hashCode());
+        result = prime * result + (ativo ? 1231 : 1237);
         result = prime * result + ((salas == null) ? 0 : salas.hashCode());
         return result;
     }
@@ -104,6 +128,8 @@ public class ProfessorModel implements Serializable {
                 return false;
         } else if (!cpf.equals(other.cpf))
             return false;
+        if (ativo != other.ativo)
+            return false;
         if (salas == null) {
             if (other.salas != null)
                 return false;
@@ -111,5 +137,7 @@ public class ProfessorModel implements Serializable {
             return false;
         return true;
     }
+
+    
 }
 

@@ -67,12 +67,13 @@ public class ProfessorController {
 
      @GetMapping(value="/cpfOuNome/{termo}")
     public ResponseEntity<Page<ProfessorModel>> findByCpfOrNomeContaining(@PathVariable(value = "termo") String termo,
+        @RequestParam(value = "ativo", required = false) Boolean ativo,
         @RequestParam(value = "page", defaultValue = "0") Integer page,
         @RequestParam(value = "size", defaultValue = "15") Integer size,
         @RequestParam(value = "direction", defaultValue = "asc") String direction) {
             var sortDirection = "desc".equalsIgnoreCase(direction) ? Direction.DESC : Direction.ASC;
             Pageable pageable = PageRequest.of(page, size, Sort.by(sortDirection,"nome"));
-            return ResponseEntity.ok(professorService.findByCpfOrNomeContaining(termo, pageable));
+            return ResponseEntity.ok(professorService.findByCpfOrNomeContaining(termo, pageable, ativo));
     }
 
     @PutMapping(value="/{id}")

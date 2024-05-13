@@ -119,7 +119,8 @@ public class HistoricoService {
                 new ProfessorWithoutSalasRecordDto(
                         professor.getId(),
                         professor.getNome(),
-                        professor.getCpf()
+                        professor.getCpf(),
+                        professor.isAtivo()
                 ),
                 historico.getSala(),
                 horarioFormatado, // Utiliza o horário formatado

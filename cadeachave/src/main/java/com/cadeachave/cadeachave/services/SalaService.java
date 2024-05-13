@@ -1,5 +1,7 @@
 package com.cadeachave.cadeachave.services;
 
+import java.util.logging.Logger;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
@@ -22,6 +24,8 @@ import com.cadeachave.cadeachave.repositories.SalaRepository;
 
 @Service
 public class SalaService {
+
+    private Logger logger = Logger.getLogger(SalaService.class.getName());
 
     @Autowired
     SalaRepository salaRepository;
@@ -58,10 +62,10 @@ public class SalaService {
         return salaPage;
     }
 
-    public Page<SalaModel> findByNomeContainingAndAberta(String nome, boolean aberta, Pageable pageable) {
-        var salaPage = salaRepository.findByNomeIgnoreCaseContainingAndAberta(nome, aberta, pageable);
+    public Page<SalaModel> findByNomeContainingAndAberta(String nome, Boolean aberta, Boolean ativo, Pageable pageable) {
+        var salaPage = salaRepository.findByNomeIgnoreCaseContainingAndAbertaAndAtivo(nome, aberta, ativo, pageable);
         if (salaPage.isEmpty()) {
-            throw new ResourceNotFoundException("Nenhuma sala encontrada com contendo o nome: "+nome+" e status correspondente a "+(aberta ? "aberta" : "fechada"));
+            throw new ResourceNotFoundException("Nenhuma sala encontrada com contendo o nome: "+nome+" e nesses parametros");
         }
         return salaPage;
     }
@@ -110,7 +114,7 @@ public class SalaService {
         SalaModel sala = salaRepository.findByNome(nome);
         if(sala==null||sala.isAtivo()!=true)
             throw new ResourceNotFoundException("Nenhuma sala encontrada com o nome: " +nome);
-        if(professor.getSalas().contains(sala)){
+        if(professor.getSalas().contains(sala)&&professor.isAtivo()){
             // if(sala.isAberta())
             //     throw new ResourceConflictException("Sala "+nome+" já está aberta.");
             // else{
@@ -130,17 +134,17 @@ public class SalaService {
         SalaModel sala = salaRepository.findByNome(nome);
         if(sala==null||sala.isAtivo()!=true)
             throw new ResourceNotFoundException("Nenhuma sala encontrada com o nome: " +nome);
-        if(professor.getSalas().contains(sala)){
+        if(professor.getSalas().contains(sala)&&professor.isAtivo()){
             // if(!sala.isAberta())
             // throw new ResourceConflictException("Sala "+nome+" já está fechada.");
             // else{
-                if(historicoService.validaUltimoAAbrir(professor, sala)){
+                // if(historicoService.validaUltimoAAbrir(professor, sala)){
                     sala.setAberta(false);
                     salaRepository.save(sala);
                     return historicoService.create(professor, sala, false);
-                }
-                else
-                throw new ResourceUnauthorizedException("Professor com cpf: "+cpf+" não foi o último a abrir a sala "+nome);
+                // }
+                // else
+                // throw new ResourceUnauthorizedException("Professor com cpf: "+cpf+" não foi o último a abrir a sala "+nome);
             // }
         }
         else
