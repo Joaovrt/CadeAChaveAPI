@@ -9,4 +9,5 @@ import com.cadeachave.cadeachave.models.UserModel;
 public interface UserRepository extends JpaRepository<UserModel, String> {
     UserDetails findByLogin(String login);
     UserModel findByProfessor(ProfessorModel professor);
+    UserModel findByProfessorId(Long professorId);
 }

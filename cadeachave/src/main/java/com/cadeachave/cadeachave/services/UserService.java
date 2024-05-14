@@ -48,6 +48,15 @@ public class UserService {
         return ResponseEntity.status(HttpStatus.OK).body(user);
     }
 
+    public ResponseEntity<UserModel> findByProfessor(Long professorId) {
+        UserModel user = userRepository.findByProfessorId(professorId);
+        if (user == null) {
+            throw new ResourceNotFoundException("Nenhum usuário encontrado com esse ID de professor.");
+        }
+        user.setPassword(null);
+        return ResponseEntity.status(HttpStatus.OK).body(user);
+    }
+
     public Page<UserModel> findAll(Pageable pageable){
         Page<UserModel> users = userRepository.findAll(pageable);
         for(int i=0;i<users.getNumberOfElements();i++)

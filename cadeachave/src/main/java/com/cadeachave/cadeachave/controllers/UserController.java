@@ -59,6 +59,11 @@ public class UserController {
         return userService.findById(id);
     }
 
+    @GetMapping(value="/professor/{id}")
+    public ResponseEntity<UserModel> findByProfessorId(@PathVariable(value = "id") Long id){
+        return userService.findByProfessor(id);
+    }
+
     @PutMapping(value="/{id}")
     public ResponseEntity<UserModel> update(@PathVariable(value = "id") String id, @RequestBody @Valid UpdateUserRecordDto updateDto){
         return userService.update(updateDto, id);
