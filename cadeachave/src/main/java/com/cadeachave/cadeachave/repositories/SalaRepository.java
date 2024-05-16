@@ -14,7 +14,7 @@ public interface SalaRepository extends JpaRepository<SalaModel,Long>{
     Page<SalaModel> findByNomeContainingIgnoreCase(String nome, Pageable pageable);
     Page<SalaModel> findByAberta(boolean aberta, Pageable pageable);
      @Query("SELECT s FROM SalaModel s " +
-           "WHERE s.nome ILIKE %:nome% " +
+           "WHERE (:nome IS NULL OR s.nome ILIKE %:nome%)" +
            "AND (:aberta IS NULL OR s.aberta = :aberta)" +
            "AND (:ativo IS NULL OR s.ativo = :ativo)" 
            )

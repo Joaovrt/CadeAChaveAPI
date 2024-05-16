@@ -65,8 +65,8 @@ public class ProfessorController {
         return professorService.findByNome(nome);
     }
 
-     @GetMapping(value="/cpfOuNome/{termo}")
-    public ResponseEntity<Page<ProfessorModel>> findByCpfOrNomeContaining(@PathVariable(value = "termo") String termo,
+     @GetMapping(value="/cpfOuNome")
+    public ResponseEntity<Page<ProfessorModel>> findByCpfOrNomeContaining(@RequestParam(value = "termo", required = false) String termo,
         @RequestParam(value = "ativo", required = false) Boolean ativo,
         @RequestParam(value = "page", defaultValue = "0") Integer page,
         @RequestParam(value = "size", defaultValue = "15") Integer size,

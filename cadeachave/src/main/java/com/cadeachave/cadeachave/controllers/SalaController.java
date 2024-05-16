@@ -79,8 +79,8 @@ public class SalaController {
         return ResponseEntity.ok(salaService.findByAberta(aberta,pageable));
     }
 
-    @GetMapping(value="/nomeComEAberta/{nome}")
-    public ResponseEntity<Page<SalaModel>> findByNomeContainingAndAberta(@PathVariable(value = "nome") String nome, 
+    @GetMapping(value="/nomeComEAberta")
+    public ResponseEntity<Page<SalaModel>> findByNomeContainingAndAberta(@RequestParam(value = "nome", required = false) String nome, 
         @RequestParam(value = "aberta", required = false) Boolean aberta,
         @RequestParam(value = "ativo", required = false) Boolean ativo,
         @RequestParam(value = "page", defaultValue = "0") Integer page,
