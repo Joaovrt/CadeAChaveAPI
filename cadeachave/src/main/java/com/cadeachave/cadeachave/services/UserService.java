@@ -98,13 +98,16 @@ public class UserService {
     }
 
     public ResponseEntity<Object> login(AuthenticationRecordDto data){
-         var usernamePassword = new UsernamePasswordAuthenticationToken(data.login(), data.password());
+        var usernamePassword = new UsernamePasswordAuthenticationToken(data.login(), data.password());
         var auth = this.authenticationManager.authenticate(usernamePassword);
-
-        var token = tokenService.generateToken((UserModel) auth.getPrincipal());
-
-        return ResponseEntity.ok(new LoginResponseRecordDto(token));
+    
+        var user = (UserModel) auth.getPrincipal();
+        var token = tokenService.generateToken(user);
+        var role = user.getRole().getRole();
+    
+        return ResponseEntity.ok(new LoginResponseRecordDto(token, role));
     }
+    
 
     public ResponseEntity<Object> register(RegisterRecordDto data){
         if(this.userRepository.findByLogin(data.login()) != null) throw new ResourceBadRequestException("Usuario ja cadastrado.");

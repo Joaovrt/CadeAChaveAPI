@@ -1,4 +1,4 @@
 package com.cadeachave.cadeachave.dtos;
 
-public record LoginResponseRecordDto(String token) {
+public record LoginResponseRecordDto(String token, String role) {
 }
